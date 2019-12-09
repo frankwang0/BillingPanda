@@ -1,0 +1,16 @@
+*~
+*.o
+*.hi
+dist
+out
+dist-newstyle
+cabal-dev
+cabal.sandbox.config
+.cabal-sandbox
+.stack-work
+.ghc.environment.*
+*.svg
+*.html
+config.json
+.DS_Store
+.vscode/phoityne.log
