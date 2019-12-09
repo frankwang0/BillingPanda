@@ -22,6 +22,7 @@ description:         Please see the README on GitHub at <https://github.com/Gith
 dependencies:
   - base
   - classy-prelude
+  - pcre-heavy
 
 default-extensions:
   - NoImplicitPrelude

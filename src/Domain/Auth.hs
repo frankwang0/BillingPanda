@@ -7,7 +7,9 @@ newtype Email = Email {emailRaw::Text} deriving (Show, Eq)
 rawEmail :: Email -> Text
 rawEmail = emailRaw
 
---mkEmail :: Text -> Either [Text] Email
+data EmailValidationErr = EmailValidationErrInvalidEmail
+
+--mkEmail :: Text -> Either [EmailValidationErr] Email
 --mkEmail = undefined
 
 newtype Password = Password { passwordRaw::Text} deriving (Show, Eq)
@@ -15,7 +17,12 @@ newtype Password = Password { passwordRaw::Text} deriving (Show, Eq)
 rawPassword :: Password -> Text
 rawPassword = passwordRaw
 
---mkPassword :: Text -> Either [Text] Password
+data PasswordValidationErr = PasswordValidationErrLength Int
+  | PasswordValidationErrMustContainUpperCase
+  | PasswordValidationErrMustContainLowerCase
+  | PasswordValidationErrMustContainNumber
+
+--mkPassword :: Text -> Either [PasswordValidationErr] Password
 --mkPassword = undefined
 
 data Auth = Auth
