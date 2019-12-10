@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 094afc021fb5fa5d583875306df27bc3521e39424251010f10186fc26f8995e4
+-- hash: 6deead6e61a855f0480628c027204c71fe6b0a886a838ffd24cdbb34e2f3ac9f
 
 name:           BillingPanda
 version:        0.1.0.0
@@ -38,7 +38,6 @@ library
   build-depends:
       base
     , classy-prelude
-    , pcre-heavy
   default-language: Haskell2010
 
 executable BillingPanda-exe
@@ -53,7 +52,6 @@ executable BillingPanda-exe
       BillingPanda
     , base
     , classy-prelude
-    , pcre-heavy
   default-language: Haskell2010
 
 test-suite BillingPanda-test
@@ -69,5 +67,4 @@ test-suite BillingPanda-test
       BillingPanda
     , base
     , classy-prelude
-    , pcre-heavy
   default-language: Haskell2010
