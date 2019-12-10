@@ -23,6 +23,7 @@ dependencies:
   - base
   - classy-prelude
   # - pcre-heavy
+  - mtl
 
 default-extensions:
   - NoImplicitPrelude
