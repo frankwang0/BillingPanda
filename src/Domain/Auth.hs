@@ -4,12 +4,12 @@ import ClassyPrelude
 import Domain.Validation
 import Control.Monad.Except
 
-newtype Email = Email {emailRaw :: Text} deriving (Show, Eq)
+newtype Email = Email {emailRaw :: Text} deriving (Show, Eq, Ord)
 
 rawEmail :: Email -> Text
 rawEmail = emailRaw
 
-data EmailValidationErr = EmailValidationErrInvalidEmail
+data EmailVerificationError = EmailVerificationErrorInvalidCode
 
 mkEmail :: Text -> Either [Text] Email
 mkEmail val = Right $ Email val
@@ -36,15 +36,24 @@ data Auth = Auth
   } deriving (Show, Eq)
 
 type VerificationCode = Text
+type UserId = Int
+type SessionId = Text
 
 data RegistrationError = RegistrationErrorEmailTaken 
   deriving (Show, Eq)
 
 class Monad m => AuthRepo m where
   addAuth :: Auth -> m (Either RegistrationError VerificationCode)
+  setEmailAsVerified :: VerificationCode -> m (Either EmailVerificationError ())
+  findUserByAuth :: Auth -> m (Maybe (UserId, Bool))
+  findEmailFromUserId :: UserId -> m (Maybe Email)
 
 class Monad m => EmailVerificationNotif m where
   notifyEmailVerification :: Email -> VerificationCode -> m ()
+
+class (Monad m) => SessionRepo m where
+  newSession :: UserId -> m SessionId
+  findUserIdBySessionId :: SessionId -> m (Maybe UserId)  
 
 register :: (AuthRepo m, EmailVerificationNotif m) => Auth -> m (Either RegistrationError ())
 register auth = runExceptT $ do

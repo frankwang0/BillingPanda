@@ -24,10 +24,14 @@ dependencies:
   - classy-prelude
   # - pcre-heavy
   - mtl
+  - data-has
+  - string-random
 
 default-extensions:
   - NoImplicitPrelude
   - OverloadedStrings
+  - ConstraintKinds
+  - FlexibleContexts
 
 library:
   source-dirs: src
@@ -37,7 +41,7 @@ executables:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
-    - -threaded
+    # - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
