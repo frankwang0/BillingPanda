@@ -29,4 +29,20 @@ instance SessionRepo App where
     findUserIdBySessionId = M.findUserIdBySessionId
 
 someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+someFunc = do
+    state <- newTVarIO M.initialState
+    run state action
+
+action :: App ()
+action = do
+    let email = either undefined id $ mkEmail "frank.wang@servcorp.com.au"
+        passw = either undefined id $ mkPassword "Password1"
+        auth = Auth email passw
+
+    register auth
+    Just vCode <- M.getNotificationForEmail email
+    verifyEmail vCode
+    Right session <- login auth
+    Just uId <- resolveSessionId session
+    Just registeredEmail <- getUser uId
+    print (session, uId, registeredEmail)

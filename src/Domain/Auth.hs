@@ -9,7 +9,9 @@ newtype Email = Email {emailRaw :: Text} deriving (Show, Eq, Ord)
 rawEmail :: Email -> Text
 rawEmail = emailRaw
 
-data EmailVerificationError = EmailVerificationErrorInvalidCode
+data EmailVerificationError = EmailVerificationErrorInvalidCode deriving (Show, Eq)
+
+data LoginError = LoginErrorInvalidAuth | LoginErrorEmailNotVerified deriving (Show, Eq)
 
 mkEmail :: Text -> Either [Text] Email
 mkEmail val = Right $ Email val
@@ -60,3 +62,20 @@ register auth = runExceptT $ do
   vCode <- ExceptT $ addAuth auth
   let email = authEmail auth
   lift $ notifyEmailVerification email vCode
+
+verifyEmail :: (AuthRepo m, SessionRepo m) => VerificationCode -> m (Either EmailVerificationError ())
+verifyEmail = setEmailAsVerified
+
+login :: (AuthRepo m, SessionRepo m) => Auth -> m (Either LoginError SessionId)
+login auth = runExceptT $ do
+  result <- lift $ findUserByAuth auth
+  case result of
+    Nothing -> throwError LoginErrorInvalidAuth
+    Just (_, False) -> throwError LoginErrorEmailNotVerified
+    Just (uId, _) -> lift $ newSession uId
+
+resolveSessionId :: (SessionRepo m) => SessionId -> m (Maybe UserId)
+resolveSessionId = findUserIdBySessionId
+
+getUser :: (AuthRepo m) => UserId -> m (Maybe Email)
+getUser = findEmailFromUserId

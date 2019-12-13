@@ -90,6 +90,12 @@ findEmailFromUserId uid = do
     let myAuth = map snd . find ((uid ==) .fst) $ stateAuths state
     return $ D.authEmail <$> myAuth
 
+getNotificationForEmail :: InMemory r m => D.Email -> m (Maybe D.VerificationCode)
+getNotificationForEmail email = do
+    tvar <- asks getter
+    state <- liftIO $ readTVarIO tvar
+    return $ lookup email $ stateNotifications state    
+
 notifyEmailVerification :: InMemory r m => D.Email -> D.VerificationCode -> m ()
 notifyEmailVerification email vCode = do
     tvar <- asks getter
@@ -99,7 +105,6 @@ notifyEmailVerification email vCode = do
             newNotifications = insertMap email vCode notifications
             newState = state { stateNotifications = newNotifications}
         writeTVar tvar newState
-
 
 newSession :: InMemory r m => D.UserId -> m D.SessionId
 newSession uId = do
