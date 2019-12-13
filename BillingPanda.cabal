@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ff2f127ae2a7e29e5520347d74319df41313b0c03dcf2d912b77ccd8c8362cb0
+-- hash: 089d4298a51f6d505967decf6b34349e30e0644ea82f912e2fe8a8398710920a
 
 name:           BillingPanda
 version:        0.1.0.0
@@ -51,7 +51,7 @@ executable BillingPanda-exe
   hs-source-dirs:
       app
   default-extensions: NoImplicitPrelude OverloadedStrings ConstraintKinds FlexibleContexts GeneralizedNewtypeDeriving
-  ghc-options: -rtsopts -with-rtsopts=-N
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       BillingPanda
     , base
