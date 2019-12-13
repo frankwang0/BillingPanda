@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0614472a6ff1305a7d4a5f767a40f2207da31e4ab257d3cb4fda26ad37c9e3f5
+-- hash: ff2f127ae2a7e29e5520347d74319df41313b0c03dcf2d912b77ccd8c8362cb0
 
 name:           BillingPanda
 version:        0.1.0.0
@@ -35,7 +35,7 @@ library
       Paths_BillingPanda
   hs-source-dirs:
       src
-  default-extensions: NoImplicitPrelude OverloadedStrings ConstraintKinds FlexibleContexts
+  default-extensions: NoImplicitPrelude OverloadedStrings ConstraintKinds FlexibleContexts GeneralizedNewtypeDeriving
   build-depends:
       base
     , classy-prelude
@@ -50,7 +50,7 @@ executable BillingPanda-exe
       Paths_BillingPanda
   hs-source-dirs:
       app
-  default-extensions: NoImplicitPrelude OverloadedStrings ConstraintKinds FlexibleContexts
+  default-extensions: NoImplicitPrelude OverloadedStrings ConstraintKinds FlexibleContexts GeneralizedNewtypeDeriving
   ghc-options: -rtsopts -with-rtsopts=-N
   build-depends:
       BillingPanda
@@ -68,7 +68,7 @@ test-suite BillingPanda-test
       Paths_BillingPanda
   hs-source-dirs:
       test
-  default-extensions: NoImplicitPrelude OverloadedStrings ConstraintKinds FlexibleContexts
+  default-extensions: NoImplicitPrelude OverloadedStrings ConstraintKinds FlexibleContexts GeneralizedNewtypeDeriving
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       BillingPanda
