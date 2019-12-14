@@ -6,11 +6,12 @@ import ClassyPrelude
 import qualified Adapter.InMemory.Auth as M
 import Domain.Auth
 import Control.Monad.Reader
+import Control.Monad.Fail
 
 type State = TVar M.State
 newtype App a = App
   { unApp :: ReaderT State IO a
-  } deriving (Applicative, Functor, Monad, MonadReader State, MonadIO)
+  } deriving (Applicative, Functor, Monad, MonadReader State, MonadIO, MonadFail)
 
 run :: State -> App a -> IO a
 run state = flip runReaderT state . unApp
@@ -39,25 +40,9 @@ action = do
       passw = either undefined id $ mkPassword "1234ABCDefgh"
       auth = Auth email passw
   register auth
-
-  notification <- M.getNotificationForEmail email
-  vCode <- case notification of 
-      Just n -> pure n
-      Nothing -> error "no notification found"
-
+  Just vCode <- M.getNotificationForEmail email
   verifyEmail vCode
-  loginSession <- login auth
-  session <- case loginSession of
-      Right s -> pure s
-      Left _ -> error "login failed"
-
-  userId <- resolveSessionId session
-  uId <- case userId of 
-      Just u -> pure u
-      Nothing -> error "no userId found"      
-
-  userEmail<- getUser uId
-  registeredEmail <- case userEmail of
-      Just e -> pure e
-      Nothing -> error "no email found"
+  Right session <- login auth
+  Just uId <- resolveSessionId session     
+  Just registeredEmail<- getUser uId
   print (session, uId, registeredEmail)
