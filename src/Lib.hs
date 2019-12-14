@@ -39,9 +39,25 @@ action = do
       passw = either undefined id $ mkPassword "1234ABCDefgh"
       auth = Auth email passw
   register auth
-  -- Just vCode <- M.getNotificationForEmail email
---   verifyEmail vCode
---   Right session <- login auth
---   Just uId <- resolveSessionId session
---   registeredEmail <- getUser uId
-  print ("", 0, email)
+
+  notification <- M.getNotificationForEmail email
+  vCode <- case notification of 
+      Just n -> pure n
+      Nothing -> error "no notification found"
+
+  verifyEmail vCode
+  loginSession <- login auth
+  session <- case loginSession of
+      Right s -> pure s
+      Left _ -> error "login failed"
+
+  userId <- resolveSessionId session
+  uId <- case userId of 
+      Just u -> pure u
+      Nothing -> error "no userId found"      
+
+  userEmail<- getUser uId
+  registeredEmail <- case userEmail of
+      Just e -> pure e
+      Nothing -> error "no email found"
+  print (session, uId, registeredEmail)
