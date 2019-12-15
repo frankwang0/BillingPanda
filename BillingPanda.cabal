@@ -4,13 +4,13 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ecaf2acbbd751cc5282ab2d25c4120b78eb9e8d7d423c236025d58344788a612
+-- hash: b415cc1dc838ac7b85ea59a3b7dfc0eb667764ec39dc3d1aadcf1b07bb404443
 
 name:           BillingPanda
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/Github username here/BillingPanda#readme>
-homepage:       https://github.com/Github username here/BillingPanda#readme
-bug-reports:    https://github.com/Github username here/BillingPanda/issues
+description:    Please see the README on GitHub at <https://github.com/frankwang0/BillingPanda#readme>
+homepage:       https://github.com/frankwang0/BillingPanda#readme
+bug-reports:    https://github.com/frankwang0/BillingPanda/issues
 author:         Author name here
 maintainer:     Author email here
 copyright:      2019 Author name here
@@ -23,7 +23,7 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/Github username here/BillingPanda
+  location: https://github.com/frankwang0/BillingPanda
 
 library
   exposed-modules:
