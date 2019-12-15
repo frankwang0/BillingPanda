@@ -3,3 +3,4 @@
 *.tix
 .DS_Store
 *.cabal
+.vscode/phoityne.log

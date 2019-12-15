@@ -20,7 +20,7 @@
             "ghciCmd": "stack ghci --test --no-load --no-build --main-is TARGET --ghci-options -fprint-evld-with-show --with-ghc=haskell-dap",
             "ghciEnv": {},
             "logFile": "${workspaceRoot}/.vscode/phoityne.log",
-            "logLevel": "WARNING",
+            "logLevel": "INFO",
             "forceInspect": false
         }
     ]

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 089d4298a51f6d505967decf6b34349e30e0644ea82f912e2fe8a8398710920a
+-- hash: ecaf2acbbd751cc5282ab2d25c4120b78eb9e8d7d423c236025d58344788a612
 
 name:           BillingPanda
 version:        0.1.0.0
@@ -30,7 +30,6 @@ library
       Adapter.InMemory.Auth
       Domain.Auth
       Domain.Validation
-      Lib
   other-modules:
       Paths_BillingPanda
   hs-source-dirs:
