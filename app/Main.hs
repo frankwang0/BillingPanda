@@ -29,8 +29,8 @@ instance SessionRepo App where
 
 action :: App ()
 action = do
-    let email = either undefined id $ mkEmail "ecky@test.com"
-        passw = either undefined id $ mkPassword "1234ABCDefgh"
+    let email = either undefined id $ mkEmail "FrankWangSydney@Gmail.com"
+        passw = either undefined id $ mkPassword "Password1"
         auth = Auth email passw
     register auth
     Just vCode <- M.getNotificationForEmail email
