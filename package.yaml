@@ -1,10 +1,10 @@
 name:                BillingPanda
 version:             0.1.0.0
-github:              "Github username here/BillingPanda"
+github:              "frankwang0/BillingPanda"
 license:             BSD3
-author:              "Author name here"
-maintainer:          "Author email here"
-copyright:           "2019 Author name here"
+author:              "Frank Wang"
+maintainer:          "frankwangsydney@gmail.com"
+copyright:           "2019 Frank Wang"
 
 extra-source-files:
 - README.md
