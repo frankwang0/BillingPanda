@@ -4,6 +4,32 @@ import ClassyPrelude
 import Data.Pool
 import Database.PostgreSQL.Simple.Migration
 import Database.PostgreSQL.Simple
+import Data.Time
+
+data Config = Config
+    { configUrl :: ByteString
+    , configStripeCount :: Int
+    , configMaxOpenConnPerStripe :: Int
+    , configIdleConnTimeout :: NominalDiffTime
+    }
+
+withPool :: Config -> (State -> IO a) -> IO a    
+withPool cfg =
+    bracket initPool cleanPool
+    where 
+        initPool = createPool openConn closeConn
+                    (configStripeCount cfg)
+                    (configIdleConnTimeout cfg)
+                    (configMaxOpenConnPerStripe cfg)
+        cleanPool = destroyAllResources
+        openConn = connectPostgreSQL (configUrl cfg)
+        closeConn = close
+
+withState :: Config -> (State -> IO a) -> IO a
+withState cfg action =
+    withPool cfg $ \state -> do
+        migrate state
+        action state
 
 type State = Pool Connection
 migrate :: State -> IO ()
