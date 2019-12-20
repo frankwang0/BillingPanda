@@ -6,7 +6,7 @@ import Data.Has
 import Text.StringRandom
 import Control.Monad.Except
 
-data State = State 
+data State = State
     { stateAuths :: [(D.UserId, D.Auth)]
     , stateUnverifiedEmails :: Map D.VerificationCode D.Email
     , stateVerifiedEmails :: Set D.Email
@@ -14,7 +14,7 @@ data State = State
     , stateNotifications :: Map D.Email D.VerificationCode
     , stateSessions :: Map D.SessionId D.UserId
     }
-    
+
 initialState :: State
 initialState = State
     { stateAuths = []
@@ -22,10 +22,10 @@ initialState = State
     , stateVerifiedEmails = mempty
     , stateUserIdCounter = 0
     , stateNotifications = mempty
-    , stateSessions = mempty       
-    }    
+    , stateSessions = mempty
+    }
 
-type InMemory r m = (Has (TVar State) r, MonadReader r m, MonadIO m)    
+type InMemory r m = (Has (TVar State) r, MonadReader r m, MonadIO m)
 
 addAuth :: InMemory r m => D.Auth -> m (Either D.RegistrationError D.VerificationCode)
 addAuth auth = do
@@ -36,7 +36,7 @@ addAuth auth = do
         state <- lift $ readTVar tvar
         let auths = stateAuths state
             email = D.authEmail auth
-            isDuplicate = any (email ==) . map (D.authEmail . snd) $ auths
+            isDuplicate = elem email . map (D.authEmail . snd) $ auths
         when isDuplicate $ throwError D.RegistrationErrorEmailTaken
 
         let newUserId = stateUserIdCounter state + 1
@@ -94,7 +94,7 @@ getNotificationForEmail :: InMemory r m => D.Email -> m (Maybe D.VerificationCod
 getNotificationForEmail email = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar
-    return $ lookup email $ stateNotifications state    
+    return $ lookup email $ stateNotifications state
 
 notifyEmailVerification :: InMemory r m => D.Email -> D.VerificationCode -> m ()
 notifyEmailVerification email vCode = do
@@ -119,7 +119,7 @@ newSession uId = do
         return sId
 
 
-findUserIdBySessionId :: InMemory r m => D.SessionId -> m (Maybe D.UserId)  
+findUserIdBySessionId :: InMemory r m => D.SessionId -> m (Maybe D.UserId)
 findUserIdBySessionId sId = do
     tvar <- asks getter
     liftIO $ lookup sId .stateSessions <$> readTVarIO tvar

@@ -5,6 +5,10 @@ import Data.Pool
 import Database.PostgreSQL.Simple.Migration
 import Database.PostgreSQL.Simple
 import Data.Time
+import Data.Has
+import qualified Control.Monad.Catch as E
+
+type PG r m = (Has State r, MonadReader r m, MonadIO m, E.MonadThrow m)
 
 data Config = Config
     { configUrl :: ByteString

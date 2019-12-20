@@ -30,6 +30,7 @@ dependencies:
   - postgresql-simple
   - postgresql-simple-migration 
   - time
+  - exceptions
 
 default-extensions:
   - NoImplicitPrelude
