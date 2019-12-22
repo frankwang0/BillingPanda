@@ -57,13 +57,17 @@ class (Monad m) => SessionRepo m where
   newSession :: UserId -> m SessionId
   findUserIdBySessionId :: SessionId -> m (Maybe UserId)  
 
-register :: (AuthRepo m, EmailVerificationNotif m) => Auth -> m (Either RegistrationError ())
+register :: (AuthRepo m, EmailVerificationNotif m) 
+          => Auth 
+          -> m (Either RegistrationError ())
 register auth = runExceptT $ do
   (uId, vCode) <- ExceptT $ addAuth auth
   let email = authEmail auth
   lift $ notifyEmailVerification email vCode
 
-verifyEmail :: (AuthRepo m, SessionRepo m) => VerificationCode -> m (Either EmailVerificationError (UserId, Email))
+verifyEmail :: (AuthRepo m, SessionRepo m) 
+            => VerificationCode 
+            -> m (Either EmailVerificationError (UserId, Email))
 verifyEmail = setEmailAsVerified
 
 login :: (AuthRepo m, SessionRepo m) => Auth -> m (Either LoginError SessionId)

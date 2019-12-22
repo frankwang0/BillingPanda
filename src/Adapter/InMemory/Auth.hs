@@ -27,7 +27,9 @@ initialState = State
 
 type InMemory r m = (Has (TVar State) r, MonadReader r m, MonadIO m)
 
-addAuth :: InMemory r m => D.Auth -> m (Either D.RegistrationError (D.UserId, D.VerificationCode))
+addAuth :: InMemory r m 
+        => D.Auth 
+        -> m (Either D.RegistrationError (D.UserId, D.VerificationCode))
 addAuth auth = do
     tvar <- asks getter
     vCode <- liftIO $ stringRandomIO "[A-Za-z0-9]{16}"
@@ -121,7 +123,6 @@ newSession uId = do
             newState = state {stateSessions = newSessions}
         writeTVar tvar newState
         return sId
-
 
 findUserIdBySessionId :: InMemory r m => D.SessionId -> m (Maybe D.UserId)
 findUserIdBySessionId sId = do

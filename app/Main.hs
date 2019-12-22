@@ -31,7 +31,7 @@ instance SessionRepo App where
 
 action :: App ()
 action = do
-    let email = either undefined id $ mkEmail "FrankWangSydney@Gmail.com"
+    let email = either undefined id $ mkEmail "cleancodematters@gmail.com"
         passw = either undefined id $ mkPassword "Password1"
         auth = Auth email passw
     register auth
