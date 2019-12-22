@@ -6,9 +6,10 @@ import Text.StringRandom
 import Data.Has
 import qualified Database.Redis as R
 import qualified Control.Monad.Catch as E
-import qualified Domain.Auth as D
 
 type State = R.Connection
+
+type Redis r m = (Has State r, MonadReader r m, MonadIO m, E.MonadThrow m)
 
 withState :: String -> (State -> IO a) -> IO a
 withState connUrl action = 
@@ -18,8 +19,6 @@ withState connUrl action =
             conn <- R.checkedConnect connInfo
             action conn
 
-type Redis r m = (Has State r, MonadReader r m, MonadIO m, E.MonadThrow m)
-
 withConn :: Redis r m => R.Redis a -> m a
 withConn action = do
     conn <- asks getter
@@ -28,7 +27,14 @@ withConn action = do
 newSession :: Redis r m => D.UserId -> m D.SessionId
 newSession userId = do
     sId <- liftIO $ stringRandomIO "[a-zA-Z0-9]{32}"
-    result <- withConn $ R.Set (encodeUtf8 sId) (fromString . show $ userId)
+    result <- withConn $ R.set (encodeUtf8 sId) (fromString . show $ userId)
     case result of 
         Right R.Ok -> return sId
         err -> throwString $ "Unexpected redis error: " <> show err
+
+findUserIdBySessionId :: Redis r m => D.SessionId -> m (Maybe D.UserId)
+findUserIdBySessionId sId = do
+    result <- withConn $ R.get (encodeUtf8 sId)
+    case result of
+        Right (Just uIdStr) -> return $ readMay . unpack . decodeUtf8 $ uIdStr
+        err -> throwString $ "unexpected redis error: " <> show err 
