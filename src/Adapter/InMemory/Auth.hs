@@ -50,6 +50,7 @@ addAuth auth = do
                 , stateUserIdCounter = newUserId
                 , stateUnverifiedEmails = newUnVerifieds
                 }
+
         lift $ writeTVar tvar newState
         return (newUserId, vCode)
 
@@ -60,12 +61,15 @@ setEmailAsVerified vCode = do
     tvar <- asks getter
     atomically . runExceptT $ do
         state <- lift $ readTVar tvar
+
         let unverifieds = stateUnverifiedEmails state
             mayEmail = lookup vCode unverifieds
-        email <- mayEmail `orThrow` D.EmailVerificationErrorInvalidCode    
+        email <- mayEmail `orThrow` D.EmailVerificationErrorInvalidCode
+
         let auths = stateAuths state
             mayUserId = map fst . find ((email ==) . D.authEmail . snd) $ auths
-        uId <- mayUserId `orThrow` D.EmailVerificationErrorInvalidCode 
+        uId <- mayUserId `orThrow` D.EmailVerificationErrorInvalidCode
+
         let verifieds = stateVerifiedEmails state
             newUnverifieds = deleteMap vCode unverifieds
             newVerifieds = insertSet email verifieds
@@ -73,6 +77,7 @@ setEmailAsVerified vCode = do
                 { stateUnverifiedEmails = newUnverifieds
                 , stateVerifiedEmails = newVerifieds
                 }
+
         lift $ writeTVar tvar newState
         return (uId, email)
 
@@ -80,6 +85,7 @@ findUserByAuth :: InMemory r m => D.Auth -> m (Maybe (D.UserId, Bool))
 findUserByAuth auth = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar
+    
     let mayUserId = map fst . find ((auth ==) . snd) $ stateAuths state
     case mayUserId of
         Nothing -> return Nothing

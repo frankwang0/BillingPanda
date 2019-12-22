@@ -31,6 +31,7 @@ dependencies:
   - postgresql-simple-migration 
   - time
   - exceptions
+  - hedis
 
 default-extensions:
   - NoImplicitPrelude
@@ -38,7 +39,6 @@ default-extensions:
   - ConstraintKinds
   - FlexibleContexts
   - GeneralizedNewtypeDeriving
-
 
 library:
   source-dirs: src
