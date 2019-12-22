@@ -6,6 +6,8 @@ import Data.Has
 import Text.StringRandom
 import Control.Monad.Except
 
+type InMemory r m = (Has (TVar State) r, MonadReader r m, MonadIO m)
+
 data State = State
     { stateAuths :: [(D.UserId, D.Auth)]
     , stateUnverifiedEmails :: Map D.VerificationCode D.Email
@@ -24,8 +26,6 @@ initialState = State
     , stateNotifications = mempty
     , stateSessions = mempty
     }
-
-type InMemory r m = (Has (TVar State) r, MonadReader r m, MonadIO m)
 
 addAuth :: InMemory r m 
         => D.Auth 
@@ -85,7 +85,7 @@ findUserByAuth :: InMemory r m => D.Auth -> m (Maybe (D.UserId, Bool))
 findUserByAuth auth = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar
-    
+
     let mayUserId = map fst . find ((auth ==) . snd) $ stateAuths state
     case mayUserId of
         Nothing -> return Nothing

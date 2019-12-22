@@ -12,6 +12,8 @@ import Text.StringRandom
 
 type PG r m = (Has State r, MonadReader r m, MonadIO m, E.MonadThrow m)
 
+type State = Pool Connection
+
 data Config = Config
     { configUrl :: ByteString
     , configStripeCount :: Int
@@ -42,7 +44,6 @@ withState cfg action =
         migrate state
         action state
 
-type State = Pool Connection
 migrate :: State -> IO ()
 migrate pool = withResource pool $ \conn -> do
     result <- withTransaction conn (runMigrations False conn cmds)
