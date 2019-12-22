@@ -45,8 +45,8 @@ data RegistrationError = RegistrationErrorEmailTaken
   deriving (Show, Eq)
 
 class Monad m => AuthRepo m where
-  addAuth :: Auth -> m (Either RegistrationError VerificationCode)
-  setEmailAsVerified :: VerificationCode -> m (Either EmailVerificationError ())
+  addAuth :: Auth -> m (Either RegistrationError (UserId, VerificationCode))
+  setEmailAsVerified :: VerificationCode -> m (Either EmailVerificationError (UserId, Email))
   findUserByAuth :: Auth -> m (Maybe (UserId, Bool))
   findEmailFromUserId :: UserId -> m (Maybe Email)
 
@@ -59,11 +59,11 @@ class (Monad m) => SessionRepo m where
 
 register :: (AuthRepo m, EmailVerificationNotif m) => Auth -> m (Either RegistrationError ())
 register auth = runExceptT $ do
-  vCode <- ExceptT $ addAuth auth
+  (uId, vCode) <- ExceptT $ addAuth auth
   let email = authEmail auth
   lift $ notifyEmailVerification email vCode
 
-verifyEmail :: (AuthRepo m, SessionRepo m) => VerificationCode -> m (Either EmailVerificationError ())
+verifyEmail :: (AuthRepo m, SessionRepo m) => VerificationCode -> m (Either EmailVerificationError (UserId, Email))
 verifyEmail = setEmailAsVerified
 
 login :: (AuthRepo m, SessionRepo m) => Auth -> m (Either LoginError SessionId)
