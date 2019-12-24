@@ -7,8 +7,9 @@ import Domain.Auth
 import Control.Monad.Reader
 import Control.Monad.Fail
 import qualified Control.Monad.Catch as E
+import qualified Adapter.Redis.Auth as Redis
 
-type State = (PG.State, TVar M.State)
+type State = (PG.State, Redis.State, TVar M.State)
 newtype App a = App
     { unApp :: ReaderT State IO a
     } deriving (Applicative, Functor, Monad, MonadReader State, MonadIO, MonadFail, E.MonadThrow)
@@ -26,8 +27,8 @@ instance EmailVerificationNotif App where
     notifyEmailVerification = M.notifyEmailVerification
 
 instance SessionRepo App where
-    newSession = M.newSession
-    findUserIdBySessionId = M.findUserIdBySessionId
+    newSession = Redis.newSession
+    findUserIdBySessionId = Redis.findUserIdBySessionId
 
 action :: App ()
 action = do
@@ -44,12 +45,15 @@ action = do
 
 main :: IO ()
 main = do
-    mState <- newTVarIO M.initialState 
-    PG.withState config $ \pgState -> run (pgState, mState) action
-    where 
-        config = PG.Config
-            { PG.configUrl = "postgresql://localhost/hauth"
-            , PG.configStripeCount = 2
-            , PG.configMaxOpenConnPerStripe =5
-            , PG.configIdleConnTimeout = 10
-            }
+    mState <- newTVarIO M.initialState
+    PG.withState pgCfg $ \pgState ->
+      Redis.withState redisCfg $ \redisState ->
+        run (pgState, redisState, mState) action
+    where
+      redisCfg = "redis://localhost:6379/0"
+      pgCfg = PG.Config 
+              { PG.configUrl = "postgresql://localhost/hauth"
+              , PG.configStripeCount = 2
+              , PG.configMaxOpenConnPerStripe = 5
+              , PG.configIdleConnTimeout = 10
+              }
