@@ -133,7 +133,7 @@ newSession uId = do
 findUserIdBySessionId :: InMemory r m => D.SessionId -> m (Maybe D.UserId)
 findUserIdBySessionId sId = do
     tvar <- asks getter
-    liftIO $ lookup sId .stateSessions <$> readTVarIO tvar
+    liftIO $ lookup sId . stateSessions <$> readTVarIO tvar
 
 orThrow :: MonadError e m => Maybe a -> e -> m a
 orThrow Nothing e = throwError e
