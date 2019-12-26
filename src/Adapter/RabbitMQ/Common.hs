@@ -55,7 +55,7 @@ publish exchange routingKey payload = do
     let msg = newMsg { msgBody = encode payload }
     liftIO . void $ publishMsg chan exchange routingKey msg
 
-consumeAndProcess :: (FromJSON a, MonadCatch m)
+consumeAndProcess :: (FromJSON a, MonadUnliftIO m)
                   => Message -> (a -> m Bool) -> m Bool
 consumeAndProcess msg handler =
     case eitherDecode' (msgBody msg) of
