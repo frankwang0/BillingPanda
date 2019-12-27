@@ -25,8 +25,8 @@ instance AuthRepo App where
     findUserByAuth = PG.findUserByAuth
     findEmailFromUserId = PG.findEmailFromUserId
 
-instance EmailVerificationNotif App where
-    notifyEmailVerification = MQAuth.notifyEmailVerification
+instance EmailNotification App where
+    sendVerificationEmail = M.sendVerificationEmail
 
 instance SessionRepo App where
     newSession = Redis.newSession
@@ -34,7 +34,7 @@ instance SessionRepo App where
 
 action :: App ()
 action = do
-    let email = either undefined id $ mkEmail "cleancodematters1@gmail.com"
+    let email = either undefined id $ mkEmail "deping.xu@gmail.com"
         passw = either undefined id $ mkPassword "Password1"
         auth = Auth email passw
     register auth

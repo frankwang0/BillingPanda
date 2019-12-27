@@ -1,5 +1,5 @@
 module Domain.Auth where
-    
+
 import ClassyPrelude
 import Domain.Validation
 import Control.Monad.Except
@@ -34,14 +34,14 @@ mkPassword = validate Password
 
 data Auth = Auth
   { authEmail :: Email
-  , authPassword :: Password  
+  , authPassword :: Password
   } deriving (Show, Eq)
 
 type VerificationCode = Text
 type UserId = Int
 type SessionId = Text
 
-data RegistrationError = RegistrationErrorEmailTaken 
+data RegistrationError = RegistrationErrorEmailTaken
   deriving (Show, Eq)
 
 class Monad m => AuthRepo m where
@@ -50,23 +50,23 @@ class Monad m => AuthRepo m where
   findUserByAuth :: Auth -> m (Maybe (UserId, Bool))
   findEmailFromUserId :: UserId -> m (Maybe Email)
 
-class Monad m => EmailVerificationNotif m where
-  notifyEmailVerification :: Email -> VerificationCode -> m ()
+class Monad m => EmailNotification m where
+  sendVerificationEmail :: Email -> VerificationCode -> m ()
 
 class (Monad m) => SessionRepo m where
   newSession :: UserId -> m SessionId
-  findUserIdBySessionId :: SessionId -> m (Maybe UserId)  
+  findUserIdBySessionId :: SessionId -> m (Maybe UserId)
 
-register :: (AuthRepo m, EmailVerificationNotif m) 
-          => Auth 
+register :: (AuthRepo m, EmailNotification m)
+          => Auth
           -> m (Either RegistrationError ())
 register auth = runExceptT $ do
   (uId, vCode) <- ExceptT $ addAuth auth
   let email = authEmail auth
-  lift $ notifyEmailVerification email vCode
+  lift $ sendVerificationEmail email vCode
 
-verifyEmail :: (AuthRepo m, SessionRepo m) 
-            => VerificationCode 
+verifyEmail :: (AuthRepo m, SessionRepo m)
+            => VerificationCode
             -> m (Either EmailVerificationError (UserId, Email))
 verifyEmail = setEmailAsVerified
 

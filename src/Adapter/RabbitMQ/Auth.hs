@@ -20,9 +20,9 @@ $(let structName = fromMaybe "" . lastMay . splitElem '.' . show $ ''EmailVerifi
       options = defaultOptions {fieldLabelModifier = lowercaseFirst . drop (length structName)} 
     in  deriveJSON options ''EmailVerificationPayload)
 
-notifyEmailVerification :: (Rabbit r m)
+sendVerificationEmail :: (Rabbit r m)
                         => D.Email -> D.VerificationCode -> m ()
-notifyEmailVerification email vCode = 
+sendVerificationEmail email vCode = 
     let payload = EmailVerificationPayload (D.rawEmail email) vCode
     in publish "auth" "userRegistered" payload
 
