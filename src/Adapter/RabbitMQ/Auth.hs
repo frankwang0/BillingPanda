@@ -10,8 +10,8 @@ import Data.Aeson.TH
 import qualified Domain.Auth as D
 
 data EmailVerificationPayload = EmailVerificationPayload
-    { emailVerificationPayloadEmail :: Text
-    , emailVerificationPayloadVerficationCode :: Text
+    { email :: Text
+    , verficationCode :: Text
     }
 
 $(let structName = fromMaybe "" . lastMay . splitElem '.' . show $ ''EmailVerificationPayload 
@@ -32,10 +32,10 @@ consumeEmailVerification runner msg =
     runner $ consumeAndProcess msg handler
     where
         handler payload =
-            case D.mkEmail (emailVerificationPayloadEmail payload) of
+            case D.mkEmail (email payload) of
                 Left err -> return False 
                 Right email -> do
-                    let vCode = emailVerificationPayloadVerficationCode payload
+                    let vCode = verficationCode payload
                     M.sendVerificationEmail email vCode
                     return True
 

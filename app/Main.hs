@@ -10,6 +10,7 @@ import qualified Control.Monad.Catch as E
 import qualified Adapter.Redis.Auth as Redis
 import qualified Adapter.RabbitMQ.Common as MQ
 import qualified Adapter.RabbitMQ.Auth as MQAuth
+import Text.StringRandom
 
 type State = (PG.State, Redis.State, MQ.State, TVar M.State)
 newtype App a = App
@@ -34,16 +35,23 @@ instance SessionRepo App where
 
 action :: App ()
 action = do
-    let email = either undefined id $ mkEmail "deping.xu@gmail.com"
+    randEmail <- liftIO $ stringRandomIO "[a-z0-9]{5}@gmail\\.com"
+    let email = either undefined id $ mkEmail randEmail
         passw = either undefined id $ mkPassword "Password1"
         auth = Auth email passw
     register auth
-    Just vCode <- M.getVerificationCode email
-    verifyEmail vCode
+    verificationCode <- pollCode email
+    verifyEmail verificationCode
     Right session <- login auth
     Just uId <- resolveSessionId session     
     Just registeredEmail<- getUser uId
-    print (session, uId, registeredEmail)   
+    print (session, uId, registeredEmail) 
+    where 
+        pollCode email = do
+            result <- M.getVerificationCode email
+            case result of
+                Nothing -> pollCode email
+                Just vCode -> return vCode  
 
 main :: IO ()
 main = do
