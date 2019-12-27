@@ -27,8 +27,8 @@ initialState = State
     , stateSessions = mempty
     }
 
-addAuth :: InMemory r m 
-        => D.Auth 
+addAuth :: InMemory r m
+        => D.Auth
         -> m (Either D.RegistrationError (D.UserId, D.VerificationCode))
 addAuth auth = do
     tvar <- asks getter
@@ -54,8 +54,8 @@ addAuth auth = do
         lift $ writeTVar tvar newState
         return (newUserId, vCode)
 
-setEmailAsVerified :: InMemory r m 
-                    => D.VerificationCode 
+setEmailAsVerified :: InMemory r m
+                    => D.VerificationCode
                     -> m (Either D.EmailVerificationError (D.UserId, D.Email))
 setEmailAsVerified vCode = do
     tvar <- asks getter
@@ -95,33 +95,33 @@ findUserByAuth auth = do
                 isVerified = elem email verifieds
             return $ Just (uId, isVerified)
 
-findEmailFromUserId :: InMemory r m => D.UserId -> m (Maybe D.Email)
-findEmailFromUserId uid = do
+findEmailByUserId :: InMemory r m => D.UserId -> m (Maybe D.Email)
+findEmailByUserId userId = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar
-    let myAuth = map snd . find ((uid ==) .fst) $ stateAuths state
+    let myAuth = map snd . find ((userId ==) .fst) $ stateAuths state
     return $ D.authEmail <$> myAuth
 
-getNotificationForEmail :: InMemory r m => D.Email -> m (Maybe D.VerificationCode)
-getNotificationForEmail email = do
+getVerificationCode :: InMemory r m => D.Email -> m (Maybe D.VerificationCode)
+getVerificationCode email = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar
     return $ lookup email $ stateNotifications state
 
-notifyEmailVerification :: InMemory r m => D.Email -> D.VerificationCode -> m ()
-notifyEmailVerification email vCode = do
+sendVerificationEmail :: InMemory r m => D.Email -> D.VerificationCode -> m ()
+sendVerificationEmail email verificationCode = do
     tvar <- asks getter
     atomically $ do
         state <- readTVar tvar
         let notifications = stateNotifications state
-            newNotifications = insertMap email vCode notifications
+            newNotifications = insertMap email verificationCode notifications
             newState = state { stateNotifications = newNotifications}
         writeTVar tvar newState
 
 newSession :: InMemory r m => D.UserId -> m D.SessionId
 newSession uId = do
     tvar <- asks getter
-    sId <- liftIO $ ((tshow uId) <>) <$> stringRandomIO "[A-Za-z0-9]{16}"
+    sId <- liftIO $ (tshow uId <>) <$> stringRandomIO "[A-Za-z0-9]{16}"
     atomically $ do
         state <- readTVar tvar
         let sessions = stateSessions state
@@ -137,4 +137,4 @@ findUserIdBySessionId sId = do
 
 orThrow :: MonadError e m => Maybe a -> e -> m a
 orThrow Nothing e = throwError e
-orThrow (Just a) _ = return a    
+orThrow (Just a) _ = return a

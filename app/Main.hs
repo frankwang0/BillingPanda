@@ -38,7 +38,7 @@ action = do
         passw = either undefined id $ mkPassword "Password1"
         auth = Auth email passw
     register auth
-    Just vCode <- M.getNotificationForEmail email
+    Just vCode <- M.getVerificationCode email
     verifyEmail vCode
     Right session <- login auth
     Just uId <- resolveSessionId session     

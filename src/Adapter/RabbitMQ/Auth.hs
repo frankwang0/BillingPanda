@@ -36,7 +36,7 @@ consumeEmailVerification runner msg =
                 Left err -> return False 
                 Right email -> do
                     let vCode = emailVerificationPayloadVerficationCode payload
-                    M.notifyEmailVerification email vCode
+                    M.sendVerificationEmail email vCode
                     return True
 
 init :: (M.InMemory r m , MonadUnliftIO m) => State -> (m Bool -> IO Bool) -> IO ()
