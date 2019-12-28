@@ -35,6 +35,31 @@ instance SessionRepo App where
     newSession = Redis.newSession
     findUserIdBySessionId = Redis.findUserIdBySessionId
 
+withState :: (PandaState -> IO ()) -> IO ()
+withState action = do
+    memoryState <- newTVarIO M.initialState
+    PG.withState postgresCfg $ \postgresState ->
+      Redis.withState redisCfg $ \redisState ->
+        MQ.withState rabbitCfg 16 $ \ rabbitState -> do
+            let state = (postgresState, redisState, rabbitState, memoryState)
+            action state
+    where
+      rabbitCfg = "amqp://guest:guest@localhost:5672/%2F"
+      redisCfg = "redis://localhost:6379/0"
+      postgresCfg = PG.Config
+              { PG.configUrl = "postgresql://localhost/hauth"
+              , PG.configStripeCount = 2
+              , PG.configMaxOpenConnPerStripe = 5
+              , PG.configIdleConnTimeout = 10
+              }
+
+main :: IO ()
+main = 
+    withState state@(_,_,rabbitState,_) -> do
+        let runner = run state
+        MQAuth.init rabbitState runner
+        runner action
+
 action :: App ()
 action = do
     randEmail <- liftIO $ stringRandomIO "[a-z0-9]{5}@gmail\\.com"
@@ -53,23 +78,4 @@ action = do
             result <- M.getVerificationCode email
             case result of
                 Nothing -> pollCode email
-                Just vCode -> return vCode
-
-main :: IO ()
-main = do
-    memoryState <- newTVarIO M.initialState
-    PG.withState postgresCfg $ \postgresState ->
-      Redis.withState redisCfg $ \redisState ->
-        MQ.withState rabbitCfg 16 $ \ rabbitState -> do
-            let runner = run (postgresState, redisState, rabbitState, memoryState)
-            MQAuth.init rabbitState runner
-            runner action
-    where
-      rabbitCfg = "amqp://guest:guest@localhost:5672/%2F"
-      redisCfg = "redis://localhost:6379/0"
-      postgresCfg = PG.Config
-              { PG.configUrl = "postgresql://localhost/hauth"
-              , PG.configStripeCount = 2
-              , PG.configMaxOpenConnPerStripe = 5
-              , PG.configIdleConnTimeout = 10
-              }
+                Just vCode -> return vCode              
