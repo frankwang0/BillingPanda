@@ -12,12 +12,12 @@ import qualified Adapter.RabbitMQ.Common as MQ
 import qualified Adapter.RabbitMQ.Auth as MQAuth
 import Text.StringRandom
 
-type State = (PG.State, Redis.State, MQ.State, TVar M.State)
+type PandaState = (PG.State, Redis.State, MQ.State, TVar M.State)
 newtype App a = App
-    { unApp :: ReaderT State IO a
-    } deriving (Applicative, Functor, Monad, MonadReader State, MonadIO, MonadFail, E.MonadThrow, MonadUnliftIO)
+    { unApp :: ReaderT PandaState IO a
+    } deriving (Applicative, Functor, Monad, MonadReader PandaState, MonadIO, MonadFail, E.MonadThrow, MonadUnliftIO)
 
-run :: State -> App a -> IO a
+run :: PandaState -> App a -> IO a
 run state = flip runReaderT state . unApp
 -- run state app = flip runReaderT state $ unApp app
 -- run state app = runReaderT (unApp app) state
@@ -45,29 +45,29 @@ action = do
     verificationCode <- pollCode email
     verifyEmail verificationCode
     Right session <- login auth
-    Just uId <- resolveSessionId session     
+    Just uId <- resolveSessionId session
     Just registeredEmail<- getUser uId
-    print (session, uId, registeredEmail) 
-    where 
+    print (session, uId, registeredEmail)
+    where
         pollCode email = do
             result <- M.getVerificationCode email
             case result of
                 Nothing -> pollCode email
-                Just vCode -> return vCode  
+                Just vCode -> return vCode
 
 main :: IO ()
 main = do
-    mState <- newTVarIO M.initialState
-    PG.withState pgCfg $ \pgState ->
+    memoryState <- newTVarIO M.initialState
+    PG.withState postgresCfg $ \postgresState ->
       Redis.withState redisCfg $ \redisState ->
-        MQ.withState mqCfg 16 $ \ mqState -> do
-            let runner = run (pgState, redisState, mqState, mState)
-            MQAuth.init mqState runner
+        MQ.withState rabbitCfg 16 $ \ rabbitState -> do
+            let runner = run (postgresState, redisState, rabbitState, memoryState)
+            MQAuth.init rabbitState runner
             runner action
     where
-      mqCfg = "amqp://guest:guest@localhost:5672/%2F"
+      rabbitCfg = "amqp://guest:guest@localhost:5672/%2F"
       redisCfg = "redis://localhost:6379/0"
-      pgCfg = PG.Config 
+      postgresCfg = PG.Config
               { PG.configUrl = "postgresql://localhost/hauth"
               , PG.configStripeCount = 2
               , PG.configMaxOpenConnPerStripe = 5

@@ -6,14 +6,14 @@ import Data.Has
 import Data.Aeson
 
 data State = State
-    { statePublisherChan :: Channel
-    , stateConsumerChan :: Channel
-    }
+          { publisherChan :: Channel
+          , consumerChan :: Channel
+          }
 type Rabbit r m = (Has State r, MonadReader r m, MonadIO m)
 
 withState :: String -> Integer -> (State -> IO a) -> IO a
 withState connUri prefetchCount action = ClassyPrelude.bracket initState destroyState action'
-    where 
+    where
         initState = do
             publisher <- openConnAndChann
             consumer <- openConnAndChann
@@ -44,10 +44,10 @@ initQueue state@(State pubChan _) queueName exchangeName routingKey = do
     bindQueue pubChan queueName exchangeName routingKey
 
 initConsumer :: State -> Text -> (Message -> IO Bool) -> IO ()
-initConsumer (State _ conChan) queueName handler = 
+initConsumer (State _ conChan) queueName handler =
     void . consumeMsgs conChan queueName Ack $ \(msg, env) -> do
         result <- handler msg
-        if result then ackEnv env else rejectEnv env False 
+        if result then ackEnv env else rejectEnv env False
 
 publish :: (ToJSON a, Rabbit r m) => Text -> Text -> a -> m ()
 publish exchange routingKey payload = do
