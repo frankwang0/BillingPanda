@@ -19,6 +19,8 @@ newtype App a = App
 
 run :: State -> App a -> IO a
 run state = flip runReaderT state . unApp
+-- run state app = flip runReaderT state $ unApp app
+-- run state app = runReaderT (unApp app) state
 
 instance AuthRepo App where
     addAuth = PG.addAuth
@@ -27,7 +29,7 @@ instance AuthRepo App where
     findEmailFromUserId = PG.findEmailFromUserId
 
 instance EmailNotification App where
-    sendVerificationEmail = M.sendVerificationEmail
+    sendVerificationEmail = MQAuth.sendVerificationEmail
 
 instance SessionRepo App where
     newSession = Redis.newSession
