@@ -12,12 +12,12 @@ import qualified Adapter.RabbitMQ.Common as MQ
 import qualified Adapter.RabbitMQ.Auth as MQAuth
 import Text.StringRandom
 
-type PandaState = (PG.State, Redis.State, MQ.State, TVar M.State)
+type AppState = (PG.State, Redis.State, MQ.State, TVar M.State)
 newtype App a = App
-    { unApp :: ReaderT PandaState IO a
-    } deriving (Applicative, Functor, Monad, MonadReader PandaState, MonadIO, MonadFail, E.MonadThrow, MonadUnliftIO)
+    { unApp :: ReaderT AppState IO a
+    } deriving (Applicative, Functor, Monad, MonadReader AppState, MonadIO, MonadFail, E.MonadThrow, MonadUnliftIO)
 
-run :: PandaState -> App a -> IO a
+run :: AppState -> App a -> IO a
 run state = flip runReaderT state . unApp
 -- run state app = flip runReaderT state $ unApp app
 -- run state app = runReaderT (unApp app) state
@@ -35,7 +35,7 @@ instance SessionRepo App where
     newSession = Redis.newSession
     findUserIdBySessionId = Redis.findUserIdBySessionId
 
-withState :: (PandaState -> IO ()) -> IO ()
+withState :: (AppState -> IO ()) -> IO ()
 withState action = do
     memoryState <- newTVarIO M.initialState
     PG.withState postgresCfg $ \postgresState ->
@@ -53,7 +53,7 @@ withState action = do
               }
 
 main :: IO ()
-main = 
+main =
     withState $ \state@(_,_,rabbitState,_) -> do
         let runner = run state
         MQAuth.init rabbitState runner
@@ -77,4 +77,4 @@ action = do
             result <- M.getVerificationCode email
             case result of
                 Nothing -> pollCode email
-                Just vCode -> return vCode              
+                Just vCode -> return vCode             
