@@ -55,7 +55,7 @@ withState action = do
 
 main :: IO ()
 main = 
-    withState state@(_,_,rabbitState,_) -> do
+    withState $ \state@(_,_,rabbitState,_) -> do
         let runner = run state
         MQAuth.init rabbitState runner
         runner action
