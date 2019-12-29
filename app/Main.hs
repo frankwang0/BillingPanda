@@ -40,9 +40,8 @@ withState action = do
     memoryState <- newTVarIO M.initialState
     PG.withState postgresCfg $ \postgresState ->
       Redis.withState redisCfg $ \redisState ->
-        MQ.withState rabbitCfg 16 $ \ rabbitState -> do
-            let state = (postgresState, redisState, rabbitState, memoryState)
-            action state
+        MQ.withState rabbitCfg 16 $ \ rabbitState ->
+            action (postgresState, redisState, rabbitState, memoryState)
     where
       rabbitCfg = "amqp://guest:guest@localhost:5672/%2F"
       redisCfg = "redis://localhost:6379/0"
