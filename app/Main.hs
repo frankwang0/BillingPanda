@@ -11,6 +11,7 @@ import qualified Adapter.Redis.Auth as Redis
 import qualified Adapter.RabbitMQ.Common as MQ
 import qualified Adapter.RabbitMQ.Auth as MQAuth
 import Text.StringRandom
+import qualified Adapter.HTTP.Main as HTTP
 
 type AppState = (PG.State, Redis.State, MQ.State, TVar M.State)
 newtype App a = App
@@ -29,22 +30,23 @@ instance AuthRepo App where
     findEmailFromUserId = PG.findEmailFromUserId
 
 instance EmailNotification App where
-    sendVerificationEmail = MQAuth.sendVerificationEmail
+    sendVerificationEmail = M.sendVerificationEmail
 
 instance SessionRepo App where
     newSession = Redis.newSession
     findUserIdBySessionId = Redis.findUserIdBySessionId
 
-withState :: (AppState -> IO ()) -> IO ()
+withState :: (Int -> AppState -> IO ()) -> IO ()
 withState action = do
     memoryState <- newTVarIO M.initialState
     PG.withState postgresCfg $ \postgresState ->
       Redis.withState redisCfg $ \redisState ->
         MQ.withState rabbitCfg 16 $ \ rabbitState ->
-            action (postgresState, redisState, rabbitState, memoryState)
+            action port (postgresState, redisState, rabbitState, memoryState)
     where
       rabbitCfg = "amqp://guest:guest@localhost:5672/%2F"
       redisCfg = "redis://localhost:6379/0"
+      port = 3000
       postgresCfg = PG.Config
               { PG.configUrl = "postgresql://localhost/hauth"
               , PG.configStripeCount = 2
@@ -54,10 +56,11 @@ withState action = do
 
 main :: IO ()
 main =
-    withState $ \state@(_,_,rabbitState,_) -> do
+    withState $ \ port state@(_,_,rabbitState,_) -> do
         let runner = run state
         MQAuth.init rabbitState runner
-        runner action
+        -- runner action
+        HTTP.main port runner
 
 action :: App ()
 action = do
