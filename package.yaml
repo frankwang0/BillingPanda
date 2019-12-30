@@ -23,17 +23,28 @@ dependencies:
   - base
   - classy-prelude
   # - pcre-heavy
-  - mtl
-  - data-has
-  - string-random
-  - resource-pool
-  - postgresql-simple
-  - postgresql-simple-migration 
+  - time-lens
   - time
-  - exceptions
+  - aeson
+  - mtl
+  - string-random
+  - data-has
+  - katip
+  - postgresql-simple
+  - postgresql-simple-migration
+  - resource-pool
   - hedis
   - amqp
-  - aeson
+  - http-types
+  - scotty
+  - cookie
+  - wai
+  - wai-extra
+  - blaze-builder
+  - digestive-functors
+  - digestive-functors-aeson
+  - exceptions
+
 
 default-extensions:
   - NoImplicitPrelude

@@ -12,7 +12,7 @@ data State = State
 type Rabbit r m = (Has State r, MonadReader r m, MonadIO m)
 
 withState :: String -> Integer -> (State -> IO a) -> IO a
-withState connUri prefetchCount action = ClassyPrelude.bracket initState destroyState action'
+withState connUri prefetchCount action = bracket initState destroyState action'
     where
         initState = do
             publisher <- openConnAndChann
