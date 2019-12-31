@@ -41,10 +41,12 @@ withState action = do
     memoryState <- newTVarIO M.initialState
     PG.withState postgresCfg $ \postgresState ->
       Redis.withState redisCfg $ \redisState ->
-        MQ.withState rabbitCfg 16 $ \ rabbitState ->
+        MQ.withState rabbitCfg $ \ rabbitState ->
             action port (postgresState, redisState, rabbitState, memoryState)
     where
-      rabbitCfg = "amqp://guest:guest@localhost:5672/%2F"
+      rabbitCfg = MQ.Config
+            { MQ.configUrl = "amqp://guest:guest@localhost:5672/%2F"
+            , MQ.prefetchCount = 16}
       redisCfg = "redis://localhost:6379/0"
       port = 3000
       postgresCfg = PG.Config

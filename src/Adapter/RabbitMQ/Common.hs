@@ -6,13 +6,17 @@ import Data.Has
 import Data.Aeson
 
 data State = State
-          { publisherChan :: Channel
-          , consumerChan :: Channel
-          }
+    { publisherChan :: Channel
+    , consumerChan :: Channel
+    }
 type Rabbit r m = (Has State r, MonadReader r m, MonadIO m)
 
-withState :: String -> Integer -> (State -> IO a) -> IO a
-withState connUri prefetchCount action = bracket initState destroyState action'
+data Config = Config
+    { configUrl :: String
+    , prefetchCount :: Integer }
+
+withState :: Config -> (State -> IO a) -> IO a
+withState config action = bracket initState destroyState action'
     where
         initState = do
             publisher <- openConnAndChann
@@ -20,10 +24,10 @@ withState connUri prefetchCount action = bracket initState destroyState action'
             return (publisher, consumer)
 
         openConnAndChann = do
-            conn <- openConnection'' . fromURI  $ connUri
+            conn <- openConnection'' . fromURI $ configUrl config
             chan <- openChannel conn
             confirmSelect chan False
-            qos chan 0 (fromInteger prefetchCount) True
+            qos chan 0 (fromInteger $ prefetchCount config) True
             return (conn, chan)
 
         destroyState((conn1, _), (conn2, _)) = do
