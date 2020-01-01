@@ -30,7 +30,7 @@ instance AuthRepo App where
     findEmailFromUserId = PG.findEmailFromUserId
 
 instance EmailNotification App where
-    sendVerificationEmail = M.sendVerificationEmail
+    sendVerificationEmail = MQAuth.sendVerificationEmail
 
 instance SessionRepo App where
     newSession = Redis.newSession
@@ -61,8 +61,8 @@ main =
     withState $ \ port state@(_,_,rabbitState,_) -> do
         let runner = run state
         MQAuth.init rabbitState runner
-        -- runner action
-        HTTP.main port runner
+        runner action
+        -- HTTP.main port runner
 
 action :: App ()
 action = do
