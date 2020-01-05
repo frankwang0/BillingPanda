@@ -1,6 +1,7 @@
 module Adapter.HTTP.Main where
 
 import Domain.Auth
+import Port.Auth
 import ClassyPrelude
 import Web.Scotty.Trans
 import Network.HTTP.Types.Status
