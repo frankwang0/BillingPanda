@@ -1,12 +1,12 @@
-module Adapter.HTTP.Main where
+module Adapters.HTTP.Main where
 
 import Domain.Auth
-import Port.Auth
+import Ports.Auth
 import ClassyPrelude
 import Web.Scotty.Trans
 import Network.HTTP.Types.Status
-import qualified Adapter.HTTP.API.Auth as AuthAPI
-import Adapter.HTTP.Common
+import qualified Adapters.HTTP.API.Auth as AuthAPI
+import Adapters.HTTP.Common
 import Network.Wai
 import Network.Wai.Middleware.Gzip
 

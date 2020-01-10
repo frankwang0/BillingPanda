@@ -1,4 +1,4 @@
-module Adapter.RabbitMQ.Common where
+module Adapters.RabbitMQ.Common where
 
 import ClassyPrelude
 import Network.AMQP

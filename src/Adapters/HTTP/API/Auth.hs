@@ -1,13 +1,13 @@
-module Adapter.HTTP.API.Auth where
+module Adapters.HTTP.API.Auth where
 
 import ClassyPrelude
 import Web.Scotty.Trans
 import Domain.Auth
-import Port.Auth
-import Usecase.Auth
+import Ports.Auth
+import Usecases.Auth
 import qualified Text.Digestive.Form as DF
 import Text.Digestive.Form ((.:))
-import Adapter.HTTP.Common
+import Adapters.HTTP.Common
 import Network.HTTP.Types.Status
 import Data.Aeson ()
 import Katip

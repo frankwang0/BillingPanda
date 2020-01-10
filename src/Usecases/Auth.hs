@@ -1,16 +1,16 @@
-module Usecase.Auth where 
+module Usecases.Auth where 
 
 import Domain.Auth
-import Port.Auth
+import Ports.Auth
 import ClassyPrelude
 import Control.Monad.Except
 import Control.Monad.Fail
 import qualified Control.Monad.Catch as E
-import qualified Adapter.Redis.Auth as Redis
-import qualified Adapter.RabbitMQ.Common as MQ
-import qualified Adapter.RabbitMQ.Auth as MQAuth
-import qualified Adapter.InMemory.Auth as M
-import qualified Adapter.PostgreSQL.Auth as PG
+import qualified Adapters.Redis.Auth as Redis
+import qualified Adapters.RabbitMQ.Common as MQ
+import qualified Adapters.RabbitMQ.Auth as MQAuth
+import qualified Adapters.InMemory.Auth as M
+import qualified Adapters.PostgreSQL.Auth as PG
 
 type AppState = (PG.State, Redis.State, MQ.State, TVar M.State)
 newtype App a = App

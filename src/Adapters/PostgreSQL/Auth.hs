@@ -1,4 +1,4 @@
-module Adapter.PostgreSQL.Auth where
+module Adapters.PostgreSQL.Auth where
 
 import ClassyPrelude
 import Data.Pool
@@ -51,7 +51,7 @@ migrate pool = withResource pool $ \conn -> do
         MigrationError err -> throwString err
         _ -> return ()
     where
-        cmds = [ MigrationInitialization, MigrationDirectory "src/Adapter/PostgreSQL/Migrations"]
+        cmds = [ MigrationInitialization, MigrationDirectory "src/Adapters/PostgreSQL/Migrations"]
 
 addAuth :: PG r m 
         => D.Auth 

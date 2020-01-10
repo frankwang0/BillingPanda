@@ -1,9 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Adapter.RabbitMQ.Auth where
+module Adapters.RabbitMQ.Auth where
 
 import ClassyPrelude
-import Adapter.RabbitMQ.Common
-import qualified Adapter.InMemory.Auth as M
+import Adapters.RabbitMQ.Common
+import qualified Adapters.InMemory.Auth as M
 import Network.AMQP
 import Data.Aeson
 import Data.Aeson.TH

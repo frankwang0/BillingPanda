@@ -1,4 +1,4 @@
-module Adapter.InMemory.Auth where
+module Adapters.InMemory.Auth where
 
 import ClassyPrelude
 import qualified Domain.Auth as D

@@ -1,4 +1,4 @@
-module Port.Auth where
+module Ports.Auth where
 
 import Domain.Auth
 import ClassyPrelude

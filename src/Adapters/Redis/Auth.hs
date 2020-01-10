@@ -1,4 +1,4 @@
-module Adapter.Redis.Auth where
+module Adapters.Redis.Auth where
 
 import ClassyPrelude
 import qualified Domain.Auth as D

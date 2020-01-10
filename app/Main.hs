@@ -2,13 +2,13 @@ module Main where
 
 import ClassyPrelude
 import Domain.Auth
-import Port.Auth
-import Usecase.Auth
+import Ports.Auth
+import Usecases.Auth
 import Control.Monad.Reader
 import Text.StringRandom
-import qualified Adapter.RabbitMQ.Auth as MQAuth
-import qualified Adapter.HTTP.Main as HTTP
-import qualified Adapter.InMemory.Auth as M
+import qualified Adapters.RabbitMQ.Auth as MQAuth
+import qualified Adapters.HTTP.Main as HTTP
+import qualified Adapters.InMemory.Auth as M
 
 main :: IO ()
 main =
