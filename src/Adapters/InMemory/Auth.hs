@@ -33,7 +33,6 @@ addAuth :: InMemory r m
 addAuth auth = do
     tvar <- asks getter
     vCode <- liftIO $ stringRandomIO "[A-Za-z0-9]{16}"
-
     atomically . runExceptT $ do
         state <- lift $ readTVar tvar
         let auths = stateAuths state
@@ -85,7 +84,6 @@ findUserByAuth :: InMemory r m => D.Auth -> m (Maybe (D.UserId, Bool))
 findUserByAuth auth = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar
-
     let mayUserId = map fst . find ((auth ==) . snd) $ stateAuths state
     case mayUserId of
         Nothing -> return Nothing
