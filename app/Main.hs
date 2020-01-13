@@ -15,8 +15,8 @@ main =
     withState $ \ port state@(_,_,rabbitState,_) -> do
         let runner = run state
         MQAuth.init rabbitState runner
-        -- runner action
-        HTTP.main port runner
+        runner action
+        -- HTTP.main port runner
 
 action :: App ()
 action = do

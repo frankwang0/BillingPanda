@@ -26,7 +26,7 @@ instance AuthRepo App where
     addAuth = PG.addAuth
     setEmailAsVerified = PG.setEmailAsVerified
     findUserByAuth = PG.findUserByAuth
-    findEmailFromUserId = PG.findEmailFromUserId
+    findEmailByUserId = PG.findEmailByUserId
 
 instance EmailNotification App where
     sendVerificationEmail = M.sendVerificationEmail
@@ -57,7 +57,7 @@ resolveSessionId :: (SessionRepo m) => SessionId -> m (Maybe UserId)
 resolveSessionId = findUserIdBySessionId
 
 getUser :: (AuthRepo m) => UserId -> m (Maybe Email)
-getUser = findEmailFromUserId
+getUser = findEmailByUserId
 
 withState :: (Int -> AppState -> IO ()) -> IO ()
 withState action = do

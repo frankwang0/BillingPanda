@@ -103,8 +103,8 @@ findUserByAuth (D.Auth email pass) = do
                 \from auths \
                 \where email = ? and pass = crypt(?,pass)"
 
-findEmailFromUserId :: PG r m => D.UserId -> m (Maybe D.Email)
-findEmailFromUserId uId = do
+findEmailByUserId :: PG r m => D.UserId -> m (Maybe D.Email)
+findEmailByUserId uId = do
     result <- withConn $ \conn -> query conn sql (Only uId)
     case result of
         [Only mail] -> case D.mkEmail mail of

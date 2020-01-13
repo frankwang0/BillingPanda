@@ -7,7 +7,7 @@ class Monad m => AuthRepo m where
   addAuth :: Auth -> m (Either RegistrationError (UserId, VerificationCode))
   setEmailAsVerified :: VerificationCode -> m (Either EmailVerificationError (UserId, Email))
   findUserByAuth :: Auth -> m (Maybe (UserId, Bool))
-  findEmailFromUserId :: UserId -> m (Maybe Email)
+  findEmailByUserId :: UserId -> m (Maybe Email)
 
 class Monad m => EmailNotification m where
   sendVerificationEmail :: Email -> VerificationCode -> m ()
