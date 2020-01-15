@@ -30,7 +30,7 @@ data PasswordValidationErr = PasswordValidationErrLength Int
   | PasswordValidationErrMustContainLowerCase
   | PasswordValidationErrMustContainNumber
 
-data Auth = Auth
+data User = User
   { authEmail :: Email
   , authPassword :: Password
   } deriving (Show, Eq)

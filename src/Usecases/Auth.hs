@@ -22,7 +22,7 @@ run state = flip runReaderT state . unApp
 -- run state app = flip runReaderT state $ unApp app
 -- run state app = runReaderT (unApp app) state
 
-instance AuthRepo App where
+instance UserRepo App where
     addAuth = PG.addAuth
     setEmailAsVerified = PG.setEmailAsVerified
     findUserByAuth = PG.findUserByAuth
@@ -35,17 +35,17 @@ instance SessionRepo App where
     newSession = Redis.newSession
     findUserIdBySessionId = Redis.findUserIdBySessionId
 
-register :: (AuthRepo m, EmailNotification m) => Auth -> m (Either RegistrationError ())
+register :: (UserRepo m, EmailNotification m) => User -> m (Either RegistrationError ())
 register auth = runExceptT $ do
   (uId, vCode) <- ExceptT $ addAuth auth
   let email = authEmail auth
   lift $ sendVerificationEmail email vCode
 
-verifyEmail :: (AuthRepo m, SessionRepo m) 
+verifyEmail :: (UserRepo m, SessionRepo m) 
             => VerificationCode -> m (Either EmailVerificationError (UserId, Email))
 verifyEmail = setEmailAsVerified
 
-login :: (AuthRepo m, SessionRepo m) => Auth -> m (Either LoginError SessionId)
+login :: (UserRepo m, SessionRepo m) => User -> m (Either LoginError SessionId)
 login auth = runExceptT $ do
   result <- lift $ findUserByAuth auth
   case result of
@@ -56,7 +56,7 @@ login auth = runExceptT $ do
 resolveSessionId :: (SessionRepo m) => SessionId -> m (Maybe UserId)
 resolveSessionId = findUserIdBySessionId
 
-getUser :: (AuthRepo m) => UserId -> m (Maybe Email)
+getUser :: (UserRepo m) => UserId -> m (Maybe Email)
 getUser = findEmailByUserId
 
 withState :: (Int -> AppState -> IO ()) -> IO ()

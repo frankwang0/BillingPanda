@@ -54,9 +54,9 @@ migrate pool = withResource pool $ \conn -> do
         cmds = [ MigrationInitialization, MigrationDirectory "src/Adapters/PostgreSQL/Migrations"]
 
 addAuth :: PG r m 
-        => D.Auth 
+        => D.User 
         -> m (Either D.RegistrationError (D.UserId, D.VerificationCode))
-addAuth (D.Auth email pass) = do
+addAuth (D.User email pass) = do
     let rawEmail = D.rawEmail email
         rawPassw = D.rawPassword pass
     vCode <- liftIO $ do
@@ -91,8 +91,8 @@ setEmailAsVerified vCode = do
                 \where email_verification_code = ? \
                 \returning id, cast (email as text)"
 
-findUserByAuth :: PG r m => D.Auth -> m (Maybe (D.UserId, Bool))
-findUserByAuth (D.Auth email pass) = do
+findUserByAuth :: PG r m => D.User -> m (Maybe (D.UserId, Bool))
+findUserByAuth (D.User email pass) = do
     let rawEmail = D.rawEmail email
         rawPassw = D.rawPassword pass
     result <- withConn $ \conn -> query conn sql (rawEmail, rawPassw)

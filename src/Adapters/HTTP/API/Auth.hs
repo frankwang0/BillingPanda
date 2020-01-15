@@ -12,7 +12,7 @@ import Network.HTTP.Types.Status
 import Data.Aeson ()
 import Katip
 
-routes:: (ScottyError e, MonadIO m, AuthRepo m, EmailNotification m, SessionRepo m)
+routes:: (ScottyError e, MonadIO m, UserRepo m, EmailNotification m, SessionRepo m)
       => ScottyT e m ()
 routes = do
     post "/api/auth/register" $ do
@@ -59,9 +59,9 @@ routes = do
 verifyEmailForm :: (Monad m) => DF.Form [Text] m VerificationCode
 verifyEmailForm = DF.text Nothing
 
-authForm :: (Monad m) => DF.Form [Text] m Auth
+authForm :: (Monad m) => DF.Form [Text] m User
 authForm =
-    Auth <$> "email" .: emailForm
+    User <$> "email" .: emailForm
          <*> "password" .: passwordForm
     where
         emailForm = DF.validate (toResult . mkEmail) (DF.text Nothing)

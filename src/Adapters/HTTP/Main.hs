@@ -10,11 +10,11 @@ import Adapters.HTTP.Common
 import Network.Wai
 import Network.Wai.Middleware.Gzip
 
-main :: (MonadIO m, AuthRepo m, EmailNotification m, SessionRepo m)
+main :: (MonadIO m, UserRepo m, EmailNotification m, SessionRepo m)
      => Int -> (m Response -> IO Response) -> IO ()
 main port runner = scottyT port runner routes
 
-routes :: (MonadIO m, AuthRepo m, EmailNotification m, SessionRepo m)
+routes :: (MonadIO m, UserRepo m, EmailNotification m, SessionRepo m)
        => ScottyT LText m () 
 routes = do
     middleware $ gzip $ def { gzipFiles = GzipCompress }

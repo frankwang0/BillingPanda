@@ -9,7 +9,7 @@ import Control.Monad.Except
 type InMemory r m = (Has (TVar State) r, MonadReader r m, MonadIO m)
 
 data State = State
-    { stateAuths :: [(D.UserId, D.Auth)]
+    { stateAuths :: [(D.UserId, D.User)]
     , stateUnverifiedEmails :: Map D.VerificationCode D.Email
     , stateVerifiedEmails :: Set D.Email
     , stateUserIdCounter :: Int
@@ -28,7 +28,7 @@ initialState = State
     }
 
 addAuth :: InMemory r m
-        => D.Auth
+        => D.User
         -> m (Either D.RegistrationError (D.UserId, D.VerificationCode))
 addAuth auth = do
     tvar <- asks getter
@@ -80,7 +80,7 @@ setEmailAsVerified vCode = do
         lift $ writeTVar tvar newState
         return (uId, email)
 
-findUserByAuth :: InMemory r m => D.Auth -> m (Maybe (D.UserId, Bool))
+findUserByAuth :: InMemory r m => D.User -> m (Maybe (D.UserId, Bool))
 findUserByAuth auth = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar

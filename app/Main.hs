@@ -23,7 +23,7 @@ action = do
     randEmail <- liftIO $ stringRandomIO "[a-z0-9]{5}@gmail\\.com"
     let email = either undefined id $ mkEmail randEmail
         passw = either undefined id $ mkPassword "Password1"
-        auth = Auth email passw
+        auth = User email passw
     register auth
     verificationCode <- pollCode email
     verifyEmail verificationCode
