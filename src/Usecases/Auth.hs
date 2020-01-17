@@ -1,4 +1,4 @@
-module Usecases.Auth where 
+module Usecases.Auth where
 
 import Domain.Auth
 import Ports.Auth
@@ -23,9 +23,9 @@ run state = flip runReaderT state . unApp
 -- run state app = runReaderT (unApp app) state
 
 instance UserRepo App where
-    addAuth = PG.addAuth
+    addUser = PG.addUser
     setEmailAsVerified = PG.setEmailAsVerified
-    findUserByAuth = PG.findUserByAuth
+    authenticate = PG.authenticate
     findEmailByUserId = PG.findEmailByUserId
 
 instance EmailNotification App where
@@ -36,18 +36,18 @@ instance SessionRepo App where
     findUserIdBySessionId = Redis.findUserIdBySessionId
 
 register :: (UserRepo m, EmailNotification m) => User -> m (Either RegistrationError ())
-register auth = runExceptT $ do
-  (uId, vCode) <- ExceptT $ addAuth auth
-  let email = authEmail auth
+register user = runExceptT $ do
+  (uId, vCode) <- ExceptT $ addUser user
+  let email = authEmail user
   lift $ sendVerificationEmail email vCode
 
-verifyEmail :: (UserRepo m, SessionRepo m) 
+verifyEmail :: (UserRepo m, SessionRepo m)
             => VerificationCode -> m (Either EmailVerificationError (UserId, Email))
 verifyEmail = setEmailAsVerified
 
 login :: (UserRepo m, SessionRepo m) => User -> m (Either LoginError SessionId)
-login auth = runExceptT $ do
-  result <- lift $ findUserByAuth auth
+login user = runExceptT $ do
+  result <- lift $ authenticate user
   case result of
     Nothing -> throwError LoginErrorInvalidAuth
     Just (_, False) -> throwError LoginErrorEmailNotVerified

@@ -30,18 +30,18 @@ initialState = State
 addAuth :: InMemory r m
         => D.User
         -> m (Either D.RegistrationError (D.UserId, D.VerificationCode))
-addAuth auth = do
+addAuth user = do
     tvar <- asks getter
     vCode <- liftIO $ stringRandomIO "[A-Za-z0-9]{16}"
     atomically . runExceptT $ do
         state <- lift $ readTVar tvar
         let auths = stateAuths state
-            email = D.authEmail auth
+            email = D.authEmail user
             isDuplicate = elem email . map (D.authEmail . snd) $ auths
         when isDuplicate $ throwError D.RegistrationErrorEmailTaken
 
         let newUserId = stateUserIdCounter state + 1
-            newAuths = (newUserId, auth) : auths
+            newAuths = (newUserId, user) : auths
             unverifieds = stateUnverifiedEmails state
             newUnVerifieds = insertMap vCode email unverifieds
             newState = state
@@ -80,16 +80,16 @@ setEmailAsVerified vCode = do
         lift $ writeTVar tvar newState
         return (uId, email)
 
-findUserByAuth :: InMemory r m => D.User -> m (Maybe (D.UserId, Bool))
-findUserByAuth auth = do
+authenticate :: InMemory r m => D.User -> m (Maybe (D.UserId, Bool))
+authenticate user = do
     tvar <- asks getter
     state <- liftIO $ readTVarIO tvar
-    let mayUserId = map fst . find ((auth ==) . snd) $ stateAuths state
+    let mayUserId = map fst . find ((user ==) . snd) $ stateAuths state
     case mayUserId of
         Nothing -> return Nothing
         Just uId -> do
             let verifieds = stateVerifiedEmails state
-                email = D.authEmail auth
+                email = D.authEmail user
                 isVerified = elem email verifieds
             return $ Just (uId, isVerified)
 

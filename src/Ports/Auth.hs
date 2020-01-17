@@ -4,9 +4,9 @@ import Domain.Auth
 import ClassyPrelude
 
 class Monad m => UserRepo m where
-  addAuth :: User -> m (Either RegistrationError (UserId, VerificationCode))
+  addUser :: User -> m (Either RegistrationError (UserId, VerificationCode))
   setEmailAsVerified :: VerificationCode -> m (Either EmailVerificationError (UserId, Email))
-  findUserByAuth :: User -> m (Maybe (UserId, Bool))
+  authenticate :: User -> m (Maybe (UserId, Bool))
   findEmailByUserId :: UserId -> m (Maybe Email)
 
 class Monad m => EmailNotification m where
