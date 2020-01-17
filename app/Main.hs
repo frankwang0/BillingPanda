@@ -23,11 +23,11 @@ action = do
     randEmail <- liftIO $ stringRandomIO "[a-z0-9]{5}@gmail\\.com"
     let email = either undefined id $ mkEmail randEmail
         passw = either undefined id $ mkPassword "Password1"
-        auth = User email passw
-    register auth
+        user = User email passw
+    register user
     verificationCode <- pollCode email
     verifyEmail verificationCode
-    Right session <- login auth
+    Right session <- login user
     Just uId <- resolveSessionId session
     Just registeredEmail<- getUserEmail uId
     print (session, uId, registeredEmail)
@@ -36,4 +36,4 @@ action = do
             result <- M.getVerificationCode email
             case result of
                 Nothing -> pollCode email
-                Just vCode -> return vCode             
+                Just vCode -> return vCode            
