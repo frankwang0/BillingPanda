@@ -26,12 +26,12 @@ instance UserRepo App where
     addUser = PG.addUser
     setEmailAsVerified = PG.setEmailAsVerified
     authenticate = PG.authenticate
-    findUserEmail = PG.findEmailByUserId
+    findEmailByUserId = PG.findEmailByUserId
 
 instance EmailNotification App where
     sendVerificationEmail = M.sendVerificationEmail
 
-instance SessionRepo App where
+instance UserSessionRepo App where
     newSession = Redis.newSession
     findUserIdBySessionId = Redis.findUserIdBySessionId
 
@@ -41,11 +41,11 @@ register user = runExceptT $ do
   let email = authEmail user
   lift $ sendVerificationEmail email vCode
 
-verifyEmail :: (UserRepo m, SessionRepo m)
+verifyEmail :: (UserRepo m, UserSessionRepo m)
             => VerificationCode -> m (Either EmailVerificationError (UserId, Email))
 verifyEmail = setEmailAsVerified
 
-login :: (UserRepo m, SessionRepo m) => User -> m (Either LoginError SessionId)
+login :: (UserRepo m, UserSessionRepo m) => User -> m (Either LoginError SessionId)
 login user = runExceptT $ do
   result <- lift $ authenticate user
   case result of
@@ -53,11 +53,11 @@ login user = runExceptT $ do
     Just (_, False) -> throwError LoginErrorEmailNotVerified
     Just (uId, _) -> lift $ newSession uId
 
-resolveSessionId :: (SessionRepo m) => SessionId -> m (Maybe UserId)
+resolveSessionId :: (UserSessionRepo m) => SessionId -> m (Maybe UserId)
 resolveSessionId = findUserIdBySessionId
 
 getUserEmail :: (UserRepo m) => UserId -> m (Maybe Email)
-getUserEmail = getUserEmail
+getUserEmail = findEmailByUserId
 
 withState :: (Int -> AppState -> IO ()) -> IO ()
 withState action = do

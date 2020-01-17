@@ -53,14 +53,14 @@ setSessionIdInCookie sId = do
                     , setCookieSameSite = Just sameSiteLax
                     }
 
-getCurrentUserId :: (SessionRepo m, ScottyError e) => ActionT e m (Maybe UserId)
+getCurrentUserId :: (UserSessionRepo m, ScottyError e) => ActionT e m (Maybe UserId)
 getCurrentUserId = do
     maySessionId <- getCookie "sId"
     case maySessionId of
         Nothing -> return Nothing
         Just sId -> lift $ resolveSessionId sId
 
-reqCurrentUserId :: (SessionRepo m, ScottyError e) => ActionT e m UserId
+reqCurrentUserId :: (UserSessionRepo m, ScottyError e) => ActionT e m UserId
 reqCurrentUserId = do
     mayUserId <- getCurrentUserId
     case mayUserId of
