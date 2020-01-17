@@ -49,7 +49,7 @@ routes = do
 
     get "/api/users" $ do
         userId <- reqCurrentUserId
-        mayEmail <- lift $ getUser userId
+        mayEmail <- lift $ getUserEmail userId
         case mayEmail of
             Nothing ->
                 raise $ stringError "Should not happen: SessionId map to invalid UserId"

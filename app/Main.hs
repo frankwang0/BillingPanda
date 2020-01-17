@@ -29,7 +29,7 @@ action = do
     verifyEmail verificationCode
     Right session <- login auth
     Just uId <- resolveSessionId session
-    Just registeredEmail<- getUser uId
+    Just registeredEmail<- getUserEmail uId
     print (session, uId, registeredEmail)
     where
         pollCode email = do
