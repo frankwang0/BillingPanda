@@ -12,6 +12,6 @@ class Monad m => UserRepo m where
 class Monad m => EmailNotification m where
   sendVerificationEmail :: Email -> VerificationCode -> m ()
 
-class (Monad m) => UserSessionRepo m where
+class Monad m => UserSessionRepo m where
   newSession :: UserId -> m SessionId
   findUserIdBySessionId :: SessionId -> m (Maybe UserId)
