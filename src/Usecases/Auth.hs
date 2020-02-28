@@ -56,7 +56,7 @@ login user = runExceptT $ do
 resolveSessionId :: (UserSessionRepo m) => SessionId -> m (Maybe UserId)
 resolveSessionId = findUserIdBySessionId
 
-getUserEmail :: (UserRepo m) => UserId -> m (Maybe Email)
+getUserEmail :: UserRepo m => UserId -> m (Maybe Email)
 getUserEmail = findEmailByUserId
 
 withState :: (Int -> AppState -> IO ()) -> IO ()
